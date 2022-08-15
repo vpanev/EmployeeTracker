@@ -1,0 +1,79 @@
+﻿@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model X.PagedList.IPagedList<Exam.Models.Employee>
+
+@{
+    ViewData["Title"] = "Home Page";
+    string todayDate = DateTime.Now.ToString("yyyy-MM-dd");
+}
+
+<div style="margin-bottom:20px">
+    @using (Html.BeginForm("Subscribe", "Home"))
+    {
+        <input id="datepicker" name="date" type="date" value="@todayDate" />
+        <input type="submit" value="Subscribe" class="btn btn-primary" />
+    }
+</div>
+
+<div class="search-filter">
+    @using (Html.BeginForm("Index", "Home"))
+    {
+        <p>
+            Find by ID: @Html.TextBox("SearchString", ViewData["CurrentFilter"] as string)
+            <input type="submit" value="Search"/>
+        </p>
+    }
+</div>
+
+<table class="table table-hover table-bordered">
+    <tr>
+        <th>
+            @Html.ActionLink(
+            "Employee Id",
+            "Index",
+            new
+            {
+            sortOrder = ViewData["NameSortParam"],
+            currentFilter = ViewData["CurrentFilter"]
+            })
+        </th>
+        <th>
+            @Html.ActionLink(
+            "Arrival",
+            "Index",
+            new
+            {
+            sortOrder = ViewData["DateSortParam"],
+            currentFilter = ViewData["CurrentFilter"]
+            })
+        </th>
+    </tr>
+    @foreach (var e in Model)
+    {
+        <tr>
+            <td>@e.EmployeeId</td>
+            <td>@e.When.ToString("dd-MM-yyyy HH:mm")</td>
+        </tr>
+    }
+</table>
+
+<div class="pagination">
+    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+    @Html.PagedListPager(
+        Model,
+        page => Url.Action(
+            "Index",
+            new
+            {
+                page,
+                sortOrder = ViewData["CurrentSort"],
+                currentFilter = ViewData["CurrentFilter"]
+            }),
+        new PagedListRenderOptions()
+        {
+            LiElementClasses = new string[] { "page-item" },
+            PageClasses = new string[] { "page-link" },
+            Display = PagedListDisplayMode.IfNeeded
+        })
+</div>
